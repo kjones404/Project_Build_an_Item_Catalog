@@ -1,23 +1,31 @@
-<html>
-
-<body>
-
-<h1>home</h1>
-
-
-
-
-
-{% for i in collection %}
-
-<div>
-
-<p>{{i.name}}</p>
-
-</div>
-
-
-{% endfor %}
-</body>
-
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
+    <title>Fresh Tomatoes v2.0</title>
+  </head>
+  <body>
+    <header>
+      <h1><i class="fas fa-film"></i> Fresh Tomatoes v2.0</h1>
+    </header>
+    <main>
+      <div class="container">
+        <div class="halfpage">
+          <div class="h_greeting">
+            <h3>welcome to Fresh Tomatoes v2.0</h3>
+            <span>Browse the collections made by others or click below to create your own!</span>
+          </div>
+        </section>
+        <div class="halfpage">
+          {% for i in collection %}
+          <div class="collection">
+          <i class="fas fa-user"></i> {{i.name}}
+          </div>
+          {% endfor %}
+        </section>
+      </div>
+    </main>
+  </body>
 </html>
