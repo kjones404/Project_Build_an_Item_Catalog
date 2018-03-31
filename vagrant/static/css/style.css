@@ -1,0 +1,166 @@
+body {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: WhiteSmoke;
+  color: #222;
+  font-size: 1.23em;
+}
+
+img,
+embed,
+object,
+video {
+  max-width: 100%;
+}
+
+
+header {
+  width: 100%;
+  margin: 20px auto 0 auto;
+  box-shadow: 0 4px 2px -2px #888;
+  align-items: center;
+  background-color: #222;
+  color: WhiteSmoke;
+}
+
+h1 {
+  margin: 25px auto 0 auto;
+}
+
+h2 {
+  border-bottom: 2px solid #222;
+  box-shadow: 0 4px 2px -2px #888;
+  text-align: center;
+}
+
+h3 {
+  text-align: center;
+}
+
+ul {
+  list-style-type: none;
+}
+
+footer {
+  padding: 5px;
+  background-color: #222;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.65em;
+  color: #999;
+}
+
+a {
+  display: block;
+  font-weight: bold;
+  color: #222;
+  text-decoration: none;
+}
+
+a:hover {
+  background-color: #222;
+  color: WhiteSmoke;
+}
+
+a:active {
+    background-color: WhiteSmoke;
+}
+
+
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto 10px auto;
+  justify-content: space-around;
+}
+
+.flex {
+  display: flex;
+}
+
+.container {
+  width: 100%;
+}
+
+.hlogo {
+  font-size: 3em;
+  color: #222;
+  margin: 10px;
+}
+
+.circle-icon {
+    background: WhiteSmoke;
+    border-radius: 50%;
+    text-align: center;
+    vertical-align: middle;
+    padding: 15px;
+}
+
+.halfpage {
+  max-width: 50%;
+}
+
+.sub{
+    font-size: 0.75em;
+}
+
+.collection {
+  width: 100%;
+  margin: 0 auto 10px auto;
+}
+
+.create {
+  width: 100%;
+}
+.owner {
+  color: WhiteSmoke;
+  font-size: 0.75em;
+  background: #222;
+  border-radius: 50%;
+  text-align: center;
+  vertical-align: middle;
+  padding: 4px;
+}
+
+.add{
+  width: 50%;
+  margin: 30px auto 0 auto;
+  text-align: right;
+}
+
+.tname {
+  width: 50%;
+  text-align: left;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+
+.row {
+  width: 100%;
+}
+
+.link {
+  width: 45%;
+  text-align: center;
+  margin: 0 auto 5px auto;
+}
+
+.poster {
+    border: 10px solid #222;
+    padding: 10px;
+    width: 220px;
+    height: 342px;
+}
+
+.movie {
+  margin: 0 auto 10px auto;
+  max-width: 30%;
+}
+
+.flogo {
+  display: block;
+  width: 75px;
+  margin: 5px auto 0 auto;
+}

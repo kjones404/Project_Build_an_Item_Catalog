@@ -2,30 +2,58 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
     <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
     <title>Fresh Tomatoes v2.0</title>
   </head>
   <body>
     <header>
-      <h1><i class="fas fa-film"></i> Fresh Tomatoes v2.0</h1>
+      <div class="flex">
+        <div class="hlogo">
+          <i class="fas fa-film circle-icon"></i>
+        </div>
+        <div class="htext">
+          <h1>Fresh Tomatoes v2.0</h1>
+          <span>The Movie Collection Database</span>
+        </div>
+      </div>
     </header>
     <main>
-      <div class="container">
+      <div class="wrap">
         <div class="halfpage">
-          <div class="h_greeting">
-            <h3>welcome to Fresh Tomatoes v2.0</h3>
-            <span>Browse the collections made by others or click below to create your own!</span>
-          </div>
-        </section>
+          <h2>Welcome to Fresh Tomatoes v2.0</h2>
+          <p>Welcome to the new Fresh Tomatoes. The original Fresh Tomatoes was created for the first project in the Udacity Full Stack nanodegree. This rebuild includes some new features that are required for the forth project in the program. These features include:</p>
+          <ul>
+            <li><i class="fas fa-database"></i> A JSON Endpoint</li>
+            <li><i class="fas fa-cog"></i> CRUD Functionality:</li>
+              <ul class="sub">
+                <li><i class="fas fa-long-arrow-alt-right"></i> Read</li>
+                <li><i class="fas fa-long-arrow-alt-right"></i> Create</li>
+                <li><i class="fas fa-long-arrow-alt-right"></i> Update</li>
+                <li><i class="fas fa-long-arrow-alt-right"></i> Delete</li>
+              </ul>
+            <li><i class="fas fa-lock"></i></i> Authentication</li>
+          </ul>
+          <p>This website uses 3rd party applications such as Flask & SQL Alchemy for CRUD functionality, along with Google’s OAuth for authentication. The Movie Database’s API is also utilized to provide fast and accurate movie data when creating or adding to your movie collections.</p>
+        </div>
         <div class="halfpage">
-          {% for i in collection %}
-          <div class="collection">
-          <i class="fas fa-user"></i> {{i.name}}
+          <div class="clink">
+            <h3>Create Your Own Database:</h3>
           </div>
-          {% endfor %}
-        </section>
+          <div class="browse">
+            <h3>Browse A Collection:</h3>
+            {% for i in collection %}
+            <div class="collection">
+              <a href="{{ url_for('movieCollection', collection_id=i.id)}}"> <i class="fas fa-user owner"></i> {{i.name}} </a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </main>
+    <footer>
+      <span class="footer_text">This product uses the TMDb API but is not endorsed or certified by TMDb.</span>
+      <img src="{{ url_for('static', filename='img/logo-green.png') }}" class="flogo" alt="The Movie Database Logo">
+    </footer>
   </body>
 </html>

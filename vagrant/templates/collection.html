@@ -1,44 +1,66 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/stylegit .css') }}">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
+    <title>Fresh Tomatoes v2.0 - {{collection.name}}'s Collection</title>
+  </head>
+  <body>
+    <header>
+      <div class="flex">
+        <div class="hlogo">
+          <i class="fas fa-film circle-icon"></i>
+        </div>
+        <div class="htext">
+          <h1>Fresh Tomatoes v2.0</h1>
+          <span>The Movie Collection Database</span>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="wrap">
+          <div class="tname">
+            <p>{{collection.name}}'s Collection:</p>
+          </div>
+          <div class="add">
+            <a href='{{url_for('newMovie', collection_id = collection.id,) }}'><i class="far fa-plus-square"></i> Add New Movie</a>
+          </div>
+        <div class="alert row">
+          <!--MESSAGE FLASHING EXAMPLE -->
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <ul>
+            {% for message in messages %}
+            <li><strong>{{message}}</strong></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          {% endwith %}
+        </div>
+        <div class="wrap">
+        {% for i in items %}
+        <div class="movie">
+          <div class="flex">
+            <div class="link">
+              <a href='{{url_for('editMovie', collection_id = collection.id, movie_id = i.id) }}' alt="edit movie data"><i class="far fa-edit"></i></a>
+            </div>
+            <div class="link">
+              <a href='{{url_for('deleteMovie', collection_id = collection.id, movie_id = i.id ) }}' alt="delete movie"><i class="fas fa-trash-alt"></i></a>
+            </div>
+          </div>
+          <img src=" {{i.img}} " class="poster" alt="movie poster for {{i.title}}">
+          <h3>{{i.title}} ({{i.year}})</h3>
+          <h4> {{i.description}} </h4>
+        </div>
+        {% endfor %}
+        </div>
+      </div>
 
-<body>
-
-<h1>{{collection.name}}</h1>
-
-<!--MESSAGE FLASHING EXAMPLE -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-
-<ul>
-{% for message in messages %}
-  <li><strong>{{message}}</strong></li>
-  {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-
-<a href='{{url_for('newMovie', collection_id = collection.id,) }}'>Create New Movie</a>
-
-{% for i in items %}
-
-<div>
-
-<p>{{i.title}}</p>
-
-<p>{{i.year}}</p>
-
-<p> {{i.img}} </p>
-
-<p> {{i.description}} </p>
-
-<a href='{{url_for('editMovie', collection_id = collection.id, movie_id = i.id) }}'>Edit</a>
-
-</br>
-<a href = '{{url_for('deleteMovie', collection_id = collection.id, movie_id = i.id ) }}'>Delete</a>
-
-</div>
-
-
-{% endfor %}
-</body>
-
+    </main>
+    <footer>
+      <span class="footer_text">This product uses the TMDb API but is not endorsed or certified by TMDb.</span>
+      <img src="{{ url_for('static', filename='img/logo-green.png') }}" class="flogo" alt="The Movie Database Logo">
+    </footer>
+  </body>
 </html>
