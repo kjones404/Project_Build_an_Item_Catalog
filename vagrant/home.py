@@ -1,7 +1,13 @@
+#!/usr/bin/env python3
+
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Collection, MovieItem
+import json
+
+
 app = Flask(__name__)
 
 
@@ -30,13 +36,17 @@ def movieCollection(collection_id):
 def newMovie(collection_id):
     if request.method == 'POST':
         newItem = MovieItem(
-            title=request.form['name'], collection_id=collection_id)
+            title=request.form['title'],
+            year=request.form['year'],
+            description=request.form['description'],
+            img=request.form['img'], collection_id=collection_id)
         session.add(newItem)
         session.commit()
         flash("new movie created!")
         return redirect(url_for('movieCollection', collection_id=collection_id))
     else:
         return render_template('newmovie.html', collection_id=collection_id)
+
 
 # Create route for editmovieItem function here
 @app.route('/collections/<int:collection_id>/<int:movie_id>/edit/',
@@ -46,6 +56,12 @@ def editMovie(collection_id, movie_id):
     if request.method == 'POST':
         if request.form['title']:
             editedItem.title = request.form['title']
+        if request.form['year']:
+            editedItem.year = request.form['year']
+        if request.form['description']:
+            editedItem.description = request.form['description']
+        if request.form['img']:
+            editedItem.img = request.form['img']
         session.add(editedItem)
         session.commit()
         return redirect(url_for('movieCollection', collection_id=collection_id))

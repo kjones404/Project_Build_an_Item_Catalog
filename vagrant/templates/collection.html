@@ -2,15 +2,16 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/stylegit .css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Raleway|Righteous" rel="stylesheet">
     <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
-    <title>Fresh Tomatoes v2.0 - {{collection.name}}'s Collection</title>
+    <title>Fresh Tomatoes v2.0</title>
   </head>
   <body>
     <header>
       <div class="flex">
         <div class="hlogo">
-          <i class="fas fa-film circle-icon"></i>
+          <a class="hlogo" href="{{ url_for('home') }}"><i class="fas fa-film circle-icon"></i></a>
         </div>
         <div class="htext">
           <h1>Fresh Tomatoes v2.0</h1>
@@ -24,7 +25,7 @@
             <p>{{collection.name}}'s Collection:</p>
           </div>
           <div class="add">
-            <a href='{{url_for('newMovie', collection_id = collection.id,) }}'><i class="far fa-plus-square"></i> Add New Movie</a>
+            <a class="basic" href='{{url_for('newMovie', collection_id = collection.id,) }}'><i class="far fa-plus-square"></i> Add New Movie</a>
           </div>
         <div class="alert row">
           <!--MESSAGE FLASHING EXAMPLE -->
@@ -43,10 +44,10 @@
         <div class="movie">
           <div class="flex">
             <div class="link">
-              <a href='{{url_for('editMovie', collection_id = collection.id, movie_id = i.id) }}' alt="edit movie data"><i class="far fa-edit"></i></a>
+              <a class="basic" href='{{url_for('editMovie', collection_id = collection.id, movie_id = i.id) }}' alt="edit movie data"><i class="far fa-edit"></i></a>
             </div>
             <div class="link">
-              <a href='{{url_for('deleteMovie', collection_id = collection.id, movie_id = i.id ) }}' alt="delete movie"><i class="fas fa-trash-alt"></i></a>
+              <a class="basic" href='{{url_for('deleteMovie', collection_id = collection.id, movie_id = i.id ) }}' alt="delete movie"><i class="fas fa-trash-alt"></i></a>
             </div>
           </div>
           <img src=" {{i.img}} " class="poster" alt="movie poster for {{i.title}}">

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Raleway|Righteous" rel="stylesheet">
     <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
     <title>Fresh Tomatoes v2.0</title>
   </head>
@@ -10,7 +11,7 @@
     <header>
       <div class="flex">
         <div class="hlogo">
-          <i class="fas fa-film circle-icon"></i>
+          <a class="hlogo" href="{{ url_for('home') }}"><i class="fas fa-film circle-icon"></i></a>
         </div>
         <div class="htext">
           <h1>Fresh Tomatoes v2.0</h1>
@@ -34,7 +35,7 @@
               </ul>
             <li><i class="fas fa-lock"></i></i> Authentication</li>
           </ul>
-          <p>This website uses 3rd party applications such as Flask & SQL Alchemy for CRUD functionality, along with Google’s OAuth for authentication. The Movie Database’s API is also utilized to provide fast and accurate movie data when creating or adding to your movie collections.</p>
+          <p>This website uses 3rd party applications such as Flask & SQL Alchemy for CRUD functionality, along with Google’s OAuth for authentication. Data for this project was gathered using the TMDb database.</p>
         </div>
         <div class="halfpage">
           <div class="clink">
@@ -44,7 +45,7 @@
             <h3>Browse A Collection:</h3>
             {% for i in collection %}
             <div class="collection">
-              <a href="{{ url_for('movieCollection', collection_id=i.id)}}"> <i class="fas fa-user owner"></i> {{i.name}} </a>
+              <a class="basic" href="{{ url_for('movieCollection', collection_id=i.id)}}"> <i class="fas fa-user owner"></i> {{i.name}} </a>
             </div>
             {% endfor %}
           </div>
