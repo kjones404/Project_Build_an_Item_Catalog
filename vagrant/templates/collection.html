@@ -21,24 +21,24 @@
     </header>
     <main>
       <div class="wrap">
-          <div class="tname">
-            <p>{{collection.name}}'s Collection:</p>
-          </div>
-          <div class="add">
-            <a class="basic" href='{{url_for('newMovie', collection_id = collection.id,) }}'><i class="far fa-plus-square"></i> Add New Movie</a>
-          </div>
         <div class="alert row">
-          <!--MESSAGE FLASHING EXAMPLE -->
           {% with messages = get_flashed_messages() %}
           {% if messages %}
           <ul>
             {% for message in messages %}
-            <li><strong>{{message}}</strong></li>
+            <li><span class="flash lwarning">{{message}}</span></li>
             {% endfor %}
           </ul>
           {% endif %}
           {% endwith %}
         </div>
+          <div class="tname">
+            <p>{{collection.name}}'s Collection:</p>
+            </div>
+          <div class="add">
+            <a class="basic" href='{{url_for('editCollection', collection_id = collection.id) }}'><i class="fas fa-cogs"></i> &nbsp&nbspEdit Collection</a>
+            <a class="basic" href='{{url_for('newMovie', collection_id=collection.id,) }}'><i class="far fa-plus-square"></i> &nbspAdd New Movie</a>
+          </div>
         <div class="wrap">
         {% for i in items %}
         <div class="movie">

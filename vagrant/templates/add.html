@@ -21,22 +21,24 @@
     </header>
     <main>
       <div class="single">
-        <div class="question">
-          <h1> Delete This Collection? </h1>
-          <span class="lwarning">Warning: This can not be undone!</span>
-        </div>
+        <h1>Create A New Collection</h1>
         <div class="movie">
-          <form action="{{ url_for('deleteCollection', collection_id=collection_id) }}" method = 'post'>
-            <div class="flex">
-              <div class="link">
-                <a class="basic" href = "{{ url_for('movieCollection', collection_id = collection_id)}}"><i class="fas fa-ban"></i> Cancel </a>
-              </div>
-              <div class="link">
-                <button type='submit', value = 'Delete'><i class="fas fa-trash-alt"></i> Delete </button>
-              </div>
-          </form>
+      <form action="{{ url_for('addCollection') }}" method = 'POST'>
+      <div class="header_edit">
+        <span>Collection Name:</span><br>
+        <input type = 'text' size='30' name = 'name' placeholder = 'Name Your Collection'><br>
+      </div>
+      <div class="flex">
+        <div class="link">
+          <a class="basic" href = "{{ url_for('home') }}"><i class="fas fa-ban"></i> Cancel </a>
+        </div>
+        <div class="link">
+          <button type='submit', value = 'Create'><i class="fas fa-trash-alt"></i> Create </button>
         </div>
       </div>
+      </form>
+      </div>
+    </div>
     </main>
     <footer>
       <span class="footer_text">This product uses the TMDb API but is not endorsed or certified by TMDb.</span>

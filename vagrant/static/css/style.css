@@ -141,6 +141,7 @@ textarea {
   margin: 0 auto 10px auto;
 }
 
+
 .create {
   width: 100%;
 }
@@ -213,8 +214,6 @@ textarea {
 
 .edit {
   margin: 20px auto 0 auto;
-
-
 }
 
 .header_edit {
@@ -228,4 +227,8 @@ textarea {
   display: block;
   width: 75px;
   margin: 5px auto 0 auto;
+}
+
+.flash {
+  font-style: italic;
 }

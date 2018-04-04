@@ -22,14 +22,15 @@
     <main>
       <div class="single">
         <div class="question">
-          <h1> Delete This Collection? </h1>
+          <h1> Remove the {{item.title}}? </h1>
           <span class="lwarning">Warning: This can not be undone!</span>
         </div>
         <div class="movie">
-          <form action="{{ url_for('deleteCollection', collection_id=collection_id) }}" method = 'post'>
+          <img src=" {{item.img}} " class="poster" alt="movie poster for {{item.title}}">
+          <form action="{{ url_for('deleteMovie', collection_id=item.collection_id, movie_id=item.id)}}" method = 'post'>
             <div class="flex">
               <div class="link">
-                <a class="basic" href = "{{ url_for('movieCollection', collection_id = collection_id)}}"><i class="fas fa-ban"></i> Cancel </a>
+                <a class="basic" href = "{{ url_for('movieCollection', collection_id = item.collection_id)}}"><i class="fas fa-ban"></i> Cancel </a>
               </div>
               <div class="link">
                 <button type='submit', value = 'Delete'><i class="fas fa-trash-alt"></i> Delete </button>

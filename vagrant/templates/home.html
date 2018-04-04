@@ -20,6 +20,17 @@
       </div>
     </header>
     <main>
+      <div class="alert row">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+          {% for message in messages %}
+          <li><span class="flash lwarning">{{message}}</span></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+      </div>
       <div class="wrap">
         <div class="halfpage">
           <h2>Welcome to Fresh Tomatoes v2.0</h2>
@@ -40,6 +51,7 @@
         <div class="halfpage">
           <div class="clink">
             <h3>Create Your Own Database:</h3>
+            <a class="basic" href="{{ url_for('addCollection') }}"> <i class="far fa-plus-square"></i></i> New Collection </a>
           </div>
           <div class="browse">
             <h3>Browse A Collection:</h3>
