@@ -1,7 +1,6 @@
 body {
   max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto 0 auto;
   background-color: WhiteSmoke;
   color: #222;
   font-size: 1.23em;
@@ -14,7 +13,6 @@ object,
 video {
   max-width: 100%;
 }
-
 
 header {
   width: 100%;
@@ -95,23 +93,65 @@ button:hover {
   color: WhiteSmoke;
 }
 
-textarea {
-    resize: none;
+.add {
+  width: 50%;
+  margin: 30px auto 0 auto;
+  text-align: right;
 }
 
-.wrap {
-  display: flex;
-  flex-wrap: wrap;
+.answer {
+  font-style: italic;
+  font-size: 0.75em;
+}
+
+.circle-icon {
+  background: WhiteSmoke;
+  border-radius: 50%;
+  text-align: center;
+  vertical-align: middle;
+  padding: 15px;
+}
+
+.collection {
+  width: 100%;
   margin: 0 auto 10px auto;
-  justify-content: space-around;
+}
+
+.container {
+  width: 100%;
+}
+
+.create {
+  width: 100%;
+}
+
+.edit {
+  margin: 20px auto 0 auto;
+}
+
+.flash {
+  font-style: italic;
 }
 
 .flex {
   display: flex;
 }
 
-.container {
-  width: 100%;
+.flogo {
+  display: block;
+  width: 75px;
+  margin: 5px auto 0 auto;
+}
+
+.halfpage {
+  max-width: 45%;
+}
+
+.header_edit {
+  display: block;
+  margin: 10px auto 10px auto;
+  font-size: 1.25em;
+  font-weight: bold;
 }
 
 .hlogo {
@@ -120,31 +160,34 @@ textarea {
   margin: 10px;
 }
 
-.circle-icon {
-    background: WhiteSmoke;
-    border-radius: 50%;
-    text-align: center;
-    vertical-align: middle;
-    padding: 15px;
+.left {
+  text-align: left;
+  width: 50%;
 }
 
-.halfpage {
-  max-width: 50%;
+.link {
+  width: 45%;
+  text-align: center;
+  margin: 0 auto 5px auto;
 }
 
-.sub{
-    font-size: 0.75em;
+.lwarning {
+  color: #900;
+  font-weight: lighter;
 }
 
-.collection {
-  width: 100%;
+.movie {
   margin: 0 auto 10px auto;
+  max-width: 30%;
 }
 
+.old {
+  text-align: center;
+  width: 275px;
+  margin: 20px auto 0 auto;
 
-.create {
-  width: 100%;
 }
+
 .owner {
   color: WhiteSmoke;
   font-size: 0.75em;
@@ -155,10 +198,39 @@ textarea {
   padding: 4px;
 }
 
-.add{
-  width: 50%;
-  margin: 30px auto 0 auto;
+.poster {
+  border: 10px solid #222;
+  padding: 10px;
+  width: 220px;
+  height: 342px;
+}
+
+.question {
+  width: 100%;
+  margin: 0 auto 10px auto;
+}
+
+.right {
+  margin: 10px auto 10px auto;
   text-align: right;
+  width: 50%;
+}
+
+.row {
+  width: 100%;
+}
+
+.side {
+  display: block;
+  width: 250px;
+}
+
+.single {
+  text-align: center;
+}
+
+.sub{
+    font-size: 0.75em;
 }
 
 .tname {
@@ -168,67 +240,9 @@ textarea {
   font-weight: bold;
 }
 
-
-.row {
-  width: 100%;
-}
-
-.link {
-  width: 45%;
-  text-align: center;
-  margin: 0 auto 5px auto;
-}
-
-.poster {
-    border: 10px solid #222;
-    padding: 10px;
-    width: 220px;
-    height: 342px;
-}
-
-.movie {
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
   margin: 0 auto 10px auto;
-  max-width: 30%;
-}
-
-.question {
-  width: 100%;
-  margin: 0 auto 10px auto;
-}
-
-.single {
-  text-align: center;
-}
-
-.lwarning {
-  color: #900000;
-  font-weight: lighter;
-}
-
-.old {
-  text-align: center;
-  width: 275px;
-  margin: 20px auto 0 auto;
-
-}
-
-.edit {
-  margin: 20px auto 0 auto;
-}
-
-.header_edit {
-  display: block;
-  margin: 10px auto 10px auto;
-  font-size: 1.25em;
-  font-weight: bold;
-}
-
-.flogo {
-  display: block;
-  width: 75px;
-  margin: 5px auto 0 auto;
-}
-
-.flash {
-  font-style: italic;
+  justify-content: space-around;
 }

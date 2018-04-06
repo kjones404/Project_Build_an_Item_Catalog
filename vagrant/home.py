@@ -1,49 +1,70 @@
 #!/usr/bin/env python3
 
+""" Project Build an Item Catalog
 
+This project is part of the Udacity Full Stack Nanodegree program.
+
+"""
+
+
+import random
+import string
+import httplib2
+import json
+import requests
 from flask import Flask, render_template, request, redirect, url_for, flash, \
-    jsonify
+    jsonify, session as login_session, make_response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
 from database_setup import Base, Collection, MovieItem
 
 
-from flask import session as login_session
-import random
-import string
-
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-import httplib2
-import json
-from flask import make_response
-import requests
-
 app = Flask(__name__)
 
+# Set Google OAuth Information
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Fresh Tomatoes v2"
 
-
+# Configure Database
 engine = create_engine('sqlite:///moviecatalogs.db')
 Base.metadata.bind = engine
+
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 
 @app.route('/login')
 def showLogin():
+    """Builds Login Session.
+
+    Args:
+        None
+    Behavior:
+        Builds anti forgery state token.
+    Returns:
+        Login template & state token.
+    """
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
 
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-
-
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """Logs user into Google.
+
+    Args:
+        None
+    Behavior:
+        Checks for valid state token. Preforms Googles OAuth2 authorization.
+        Checks login status and creates login session if needed.
+    Returns:
+        Google username.
+    """
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -96,7 +117,7 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps('Already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -113,85 +134,129 @@ def gconnect():
     data = answer.json()
 
     login_session['username'] = data['name']
-    login_session['picture'] = data['picture']
-    login_session['email'] = data['email']
 
     output = ''
-    output += '<h1>Welcome, '
     output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
-    print "done!"
     return output
 
 
 @app.route('/gdisconnect')
 def gdisconnect():
+    """Disconnects from Google.
+
+    Args:
+        None
+    Behavior:
+        Attempts to disconnect form google. If successful deletes user data.
+    Returns:
+        Redirect URL and disconnect status.
+    """
     access_token = login_session.get('access_token')
     if access_token is None:
-        print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-    print 'In gdisconnect access token is %s', access_token
-    print 'User name is: '
-    print login_session['username']
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+        flash("Current user not connected.")
+        return redirect(url_for('home'))
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % \
+        login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print 'result is '
-    print result
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['gplus_id']
         del login_session['username']
-        del login_session['email']
-        del login_session['picture']
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        flash("Successfully logged out.")
+        return redirect(url_for('home'))
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        flash("Failed to revoke token for given user.")
+        return redirect(url_for('home'))
 
 
 @app.route('/collections/JSON')
 def allJSON():
+    """JSON Query for whole Database
+
+    Args:
+        None
+    Behavior:
+        Pulls requested DB data
+    Returns:
+        Provides request DB data in JSON format.
+    """
     collection = session.query(Collection).all()
     return jsonify(collection=[i.serialize for i in collection])
 
+
 @app.route('/collections/<int:collection_id>/JSON')
 def collectionJSON(collection_id):
+    """JSON Query for requested collection.
+
+    Args:
+        collection_id = Primary_key for collection
+    Behavior:
+        Pulls requested DB data
+    Returns:
+        Provides request DB data in JSON format.
+    """
     collection = session.query(Collection).filter_by(id=collection_id).one()
     movies = session.query(MovieItem).filter_by(
         collection_id=collection_id).all()
     return jsonify(MovieItems=[i.serialize for i in movies])
 
+
+@app.route('/collections/<int:collection_id>/<int:movie_id>/JSON')
+def movieJSON(collection_id, movie_id):
+    """JSON Query for requested movie.
+
+    Args:
+        collection_id: Primary_key for collection
+        movie_id: Primary_key for movie
+    Behavior:
+        Pulls requested DB data
+    Returns:
+        Provides request DB data in JSON format.
+    """
+    collection = session.query(Collection).filter_by(id=collection_id).one()
+    movie = session.query(MovieItem).filter_by(id=movie_id).one()
+    return jsonify(MovieItem=movie.serialize)
+
+
 @app.route('/')
 @app.route('/home')
 def home():
+    """Display application home page.
+
+    Args:
+        None
+    Behavior:
+        Collect list of collections
+    Returns:
+        home page with collection list.
+    """
     collection = session.query(Collection).all()
     return render_template('home.html', collection=collection)
 
-@app.route('/collections/<int:collection_id>')
-@app.route('/collections/<int:collection_id>/')
-def movieCollection(collection_id):
-    collection = session.query(Collection).filter_by(id=collection_id).one()
-    items = session.query(MovieItem).filter_by(collection_id=collection.id)
-    return render_template('collection.html', collection=collection,
-                            items=items)
 
 # Create route for newMovieItem function here
 @app.route('/collections/add', methods=['GET', 'POST'])
 @app.route('/collections/add/', methods=['GET', 'POST'])
 def addCollection():
-    if request.method == 'POST':
-        newItem = Collection(
-            name=request.form['name'])
+    """Create a new movie collection.
+
+    Args:
+        None
+    Behavior:
+        Checks login status. Handle post or get requests. Collects new
+        collection name and commits change to database.
+    Returns:
+        Get request: template to create a new collection.
+        Post request: flash update and redirect to home.html
+    """
+    if 'username' not in login_session:
+        collection = session.query(Collection).all()
+        flash("Login before you create a new collection.")
+        return render_template('home.html', collection=collection)
+    elif request.method == 'POST':
+        newItem = Collection(name=request.form['name'])
         session.add(newItem)
         session.commit()
         flash("New collection created!")
@@ -199,31 +264,82 @@ def addCollection():
     else:
         return render_template('add.html')
 
-# Create route for editmovieItem function here
-@app.route('/collections/<int:collection_id>/edit',
-            methods=['GET', 'POST'])
-@app.route('/collections/<int:collection_id>/edit/',
-            methods=['GET', 'POST'])
-def editCollection(collection_id):
+
+@app.route('/collections/<int:collection_id>')
+@app.route('/collections/<int:collection_id>/')
+def movieCollection(collection_id):
+    """Display movie collection.
+
+    Args:
+        collection_id: Primary_key for collection
+    Behavior:
+        Checks login status. Collects collection data
+    Returns:
+        Collection website based on login status.
+    """
     collection = session.query(Collection).filter_by(id=collection_id).one()
-    if request.method == 'POST':
+    items = session.query(MovieItem).filter_by(collection_id=collection.id)
+    if 'username' not in login_session:
+        return render_template('collection_pub.html', collection=collection,
+                               items=items)
+    else:
+        return render_template('collection.html', collection=collection,
+                               items=items)
+
+
+@app.route('/collections/<int:collection_id>/edit', methods=['GET', 'POST'])
+@app.route('/collections/<int:collection_id>/edit/', methods=['GET', 'POST'])
+def editCollection(collection_id):
+    """Edit movie collection data.
+
+    Args:
+        collection_id: Primary_key for collection
+    Behavior:
+        Checks login status. Handle post or get requests. Collects new
+        collection data. Commit changes to database.
+    Returns:
+        Get request: template to edit collection data.
+        Post request: flash update and redirect to collection
+    """
+    collection = session.query(Collection).filter_by(id=collection_id).one()
+    items = session.query(MovieItem).filter_by(collection_id=collection.id)
+    if 'username' not in login_session:
+        flash("Please login before you edit a collection.")
+        return render_template('collection_pub.html', collection=collection,
+                               items=items)
+    elif request.method == 'POST':
         if request.form['name']:
             collection.name = request.form['name']
         session.add(collection)
         session.commit()
         flash("Collection Updated!")
-        return redirect(url_for('movieCollection', collection_id=collection_id))
+        return redirect(url_for('movieCollection',
+                                collection_id=collection_id))
     else:
         return render_template(
             'edit.html', collection_id=collection_id)
 
-# Create a route for deleteMovieItem function here
-@app.route('/collections/<int:collection_id>/delete',
-            methods=['GET', 'POST'])
-@app.route('/collections/<int:collection_id>/delete/',
-            methods=['GET', 'POST'])
+
+@app.route('/collections/<int:collection_id>/delete', methods=['GET', 'POST'])
+@app.route('/collections/<int:collection_id>/delete/', methods=['GET', 'POST'])
 def deleteCollection(collection_id):
+    """Delete collection data.
+
+    Args:
+        collection_id: Primary_key for collection
+    Behavior:
+        Checks login status. Handle post or get requests. Deletes collection
+        data from database.
+    Returns:
+        Get request: confirm request to delete data
+        Post request: flash update and redirect to home.html
+    """
     collection = session.query(Collection).filter_by(id=collection_id).one()
+    items = session.query(MovieItem).filter_by(collection_id=collection.id)
+    if 'username' not in login_session:
+        flash("Please login before you delete a collection.")
+        return render_template('collection_pub.html', collection=collection,
+                               items=items)
     if request.method == 'POST':
         session.delete(collection)
         session.commit()
@@ -232,10 +348,27 @@ def deleteCollection(collection_id):
     else:
         return render_template('delete.html', collection_id=collection_id)
 
-# Create route for newMovieItem function here
+
 @app.route('/collections/<int:collection_id>/new', methods=['GET', 'POST'])
 @app.route('/collections/<int:collection_id>/new/', methods=['GET', 'POST'])
 def newMovie(collection_id):
+    """Create new movie.
+
+    Args:
+        collection_id: Primary_key for collection
+    Behavior:
+        Checks login status. Handle post or get requests. Collects new movie
+        information. Commits new movie to database.
+    Returns:
+        Get request: template for new movie data
+        Post request: flash update and redirect to movie collection
+    """
+    collection = session.query(Collection).filter_by(id=collection_id).one()
+    items = session.query(MovieItem).filter_by(collection_id=collection.id)
+    if 'username' not in login_session:
+        flash("Please login before you add a movie.")
+        return render_template('collection_pub.html', collection=collection,
+                               items=items)
     if request.method == 'POST':
         newItem = MovieItem(
             title=request.form['title'],
@@ -245,18 +378,37 @@ def newMovie(collection_id):
         session.add(newItem)
         session.commit()
         flash("New movie created!")
-        return redirect(url_for('movieCollection', collection_id=collection_id))
+        return redirect(url_for('movieCollection',
+                                collection_id=collection_id))
     else:
         return render_template('newmovie.html', collection_id=collection_id)
 
 
 # Create route for editmovieItem function here
 @app.route('/collections/<int:collection_id>/<int:movie_id>/edit',
-            methods=['GET', 'POST'])
+           methods=['GET', 'POST'])
 @app.route('/collections/<int:collection_id>/<int:movie_id>/edit/',
-            methods=['GET', 'POST'])
+           methods=['GET', 'POST'])
 def editMovie(collection_id, movie_id):
+    """Edit movie data.
+
+    Args:
+        collection_id: Primary_key for collection
+        movie_id: Primary_key for movie
+    Behavior:
+        Checks login status. Handle post or get requests. Collects new movie
+        information. Commits movie data changes to database.
+    Returns:
+        Get request: template for edit movie data
+        Post request: flash update and redirect to movie collection
+    """
     editedItem = session.query(MovieItem).filter_by(id=movie_id).one()
+    collection = session.query(Collection).filter_by(id=collection_id).one()
+    items = session.query(MovieItem).filter_by(collection_id=collection.id)
+    if 'username' not in login_session:
+        flash("Please login before you edit a movie.")
+        return render_template('collection_pub.html', collection=collection,
+                               items=items)
     if request.method == 'POST':
         if request.form['title']:
             editedItem.title = request.form['title']
@@ -269,28 +421,48 @@ def editMovie(collection_id, movie_id):
         session.add(editedItem)
         session.commit()
         flash("Movie Updated!")
-        return redirect(url_for('movieCollection', collection_id=collection_id))
+        return redirect(url_for('movieCollection',
+                                collection_id=collection_id))
     else:
-        return render_template(
-            'editmovie.html', collection_id=collection_id, movie_id=movie_id, item=editedItem)
+        return render_template('editmovie.html', collection_id=collection_id,
+                               movie_id=movie_id, item=editedItem)
+
 
 # Create a route for deleteMovieItem function here
 @app.route('/collections/<int:collection_id>/<int:movie_id>/delete',
-            methods=['GET', 'POST'])
+           methods=['GET', 'POST'])
 @app.route('/collections/<int:collection_id>/<int:movie_id>/delete/',
-            methods=['GET', 'POST'])
+           methods=['GET', 'POST'])
 def deleteMovie(collection_id, movie_id):
+    """Delete movie data.
+
+    Args:
+        collection_id: Primary_key for collection
+        movie_id: Primary_key for movie
+    Behavior:
+        Checks login status. Handle post or get requests. Deletes movie
+        from database.
+    Returns:
+        Get request: confirm request to delete movie
+        Post request: flash update and redirect to movie collection
+    """
     itemToDelete = session.query(MovieItem).filter_by(id=movie_id).one()
+    collection = session.query(Collection).filter_by(id=collection_id).one()
+    items = session.query(MovieItem).filter_by(collection_id=collection.id)
+    if 'username' not in login_session:
+        flash("Please login before you delete a movie.")
+        return render_template('collection_pub.html', collection=collection,
+                               items=items)
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
         flash("Movie Deleted!")
-        return redirect(url_for('movieCollection', collection_id=collection_id))
+        return redirect(url_for('movieCollection',
+                                collection_id=collection_id))
     else:
         return render_template('deletemovie.html', item=itemToDelete)
 
-
-
+# set server settings
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True

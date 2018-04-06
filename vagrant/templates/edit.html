@@ -20,17 +20,37 @@
       </div>
     </header>
     <main>
+      <div class="flex">
+        <div class="alert row left">
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <ul>
+            {% for message in messages %}
+            <li><span class="flash lwarning">{{message}}</span></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          {% endwith %}
+        </div>
+        <div class="right sub">
+          {%if 'username' not in session %}
+          <a class="basic" href="{{url_for('showLogin')}}"><i class="fas fa-sign-in-alt"></i> Sign-In </a>
+          {% else %}
+          <a class="basic" href="{{url_for('gdisconnect')}}">Logout <i class="fas fa-sign-out-alt"></i></a>
+          {% endif %}
+        </div>
+      </div>
       <div class="single">
         <div class="question">
           <h1> Edit the name of or delete this collection? </h1>
         </div>
         <div class="movie">
           <form action= "{{url_for('editCollection', collection_id = collection_id) }}" method = 'POST'>
-          <div class="header_edit">
-          <span>New Collection Name:</span><br>
-          <input type = 'text' size='30' name = 'name' placeholder = 'New Name Here'><br>
-        </div>
-        <div class="flex">
+            <div class="header_edit">
+              <span>New Collection Name:</span><br>
+              <input type = 'text' size='30' name = 'name' placeholder = 'New Name Here'><br>
+            </div>
+            <div class="flex">
               <div class="link">
                 <a class="basic" href = "{{ url_for('movieCollection', collection_id = collection_id)}}"><i class="fas fa-ban"></i> Cancel </a>
               </div>
@@ -38,11 +58,10 @@
                 <button type='submit', value = 'Edit'><i class="fas fa-cogs"></i> Edit </button>
               </div>
             </div>
-                <p>Or</p>
-                <div class="link">
-                  <a class="basic" href = "{{ url_for('deleteCollection', collection_id = collection_id)}}"><i class="fas fa-trash-alt"></i> Delete</a>
-                </div>
-              </div>
+            <p>Or</p>
+            <div class="link">
+              <a class="basic" href = "{{ url_for('deleteCollection', collection_id = collection_id)}}"><i class="fas fa-trash-alt"></i> Delete</a>
+            </div>
           </form>
         </div>
       </div>

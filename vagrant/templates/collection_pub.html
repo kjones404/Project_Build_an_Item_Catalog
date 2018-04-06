@@ -40,22 +40,31 @@
           {% endif %}
         </div>
       </div>
-      <div class="single">
-        <div class="question">
-          <h1> Delete This Collection? </h1>
-          <span class="lwarning">Warning: This can not be undone!</span>
+      <div class="wrap">
+        <div class="alert row">
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <ul>
+            {% for message in messages %}
+            <li><span class="flash lwarning">{{message}}</span></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          {% endwith %}
         </div>
-        <div class="movie">
-          <form action="{{ url_for('deleteCollection', collection_id=collection_id) }}" method = 'post'>
-            <div class="flex">
-              <div class="link">
-                <a class="basic" href = "{{ url_for('movieCollection', collection_id = collection_id)}}"><i class="fas fa-ban"></i> Cancel </a>
-              </div>
-              <div class="link">
-                <button type='submit', value = 'Delete'><i class="fas fa-trash-alt"></i> Delete </button>
-              </div>
-            </div>
-          </form>
+          <div class="tname">
+            <p>{{collection.name}}'s Collection:</p>
+          </div>
+          <div class="add">
+          </div>
+        <div class="wrap">
+          {% for i in items %}
+          <div class="movie">
+            <img src=" {{i.img}} " class="poster" alt="movie poster for {{i.title}}">
+            <h3>{{i.title}} ({{i.year}})</h3>
+            <h4> {{i.description}} </h4>
+          </div>
+          {% endfor %}
         </div>
       </div>
     </main>

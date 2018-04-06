@@ -20,16 +20,25 @@
       </div>
     </header>
     <main>
-      <div class="alert row">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-          {% for message in messages %}
-          <li><span class="flash lwarning">{{message}}</span></li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
+      <div class="flex">
+        <div class="alert row left">
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <ul>
+            {% for message in messages %}
+            <li><span class="flash lwarning">{{message}}</span></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          {% endwith %}
+        </div>
+        <div class="right sub">
+          {%if 'username' not in session %}
+          <a class="basic" href="{{url_for('showLogin')}}"><i class="fas fa-sign-in-alt"></i> Sign-In </a>
+          {% else %}
+          <a class="basic" href="{{url_for('gdisconnect')}}">Logout <i class="fas fa-sign-out-alt"></i></a>
+          {% endif %}
+        </div>
       </div>
       <div class="wrap">
         <div class="halfpage">
