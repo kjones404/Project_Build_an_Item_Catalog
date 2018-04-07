@@ -18,7 +18,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
-from database_setup import Base, Collection, MovieItem
+from database_setup import Base, Collection, MovieItem, User
 
 
 app = Flask(__name__)
@@ -134,6 +134,13 @@ def gconnect():
     data = answer.json()
 
     login_session['username'] = data['name']
+    login_session['email'] = data['email']
+
+    # See if a user exists, if it doesn't make a new one
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
 
     output = ''
     output += login_session['username']
@@ -256,7 +263,8 @@ def addCollection():
         flash("Login before you create a new collection.")
         return render_template('home.html', collection=collection)
     elif request.method == 'POST':
-        newItem = Collection(name=request.form['name'])
+        newItem = Collection(name=request.form['name'],
+                             user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         flash("New collection created!")
@@ -278,8 +286,10 @@ def movieCollection(collection_id):
         Collection website based on login status.
     """
     collection = session.query(Collection).filter_by(id=collection_id).one()
+    creator = getUserInfo(collection.user_id)
     items = session.query(MovieItem).filter_by(collection_id=collection.id)
-    if 'username' not in login_session:
+    if ('username' not in login_session or creator.id !=
+       login_session['user_id']):
         return render_template('collection_pub.html', collection=collection,
                                items=items)
     else:
@@ -302,11 +312,12 @@ def editCollection(collection_id):
         Post request: flash update and redirect to collection
     """
     collection = session.query(Collection).filter_by(id=collection_id).one()
+    creator = getUserInfo(collection.user_id)
     items = session.query(MovieItem).filter_by(collection_id=collection.id)
-    if 'username' not in login_session:
-        flash("Please login before you edit a collection.")
-        return render_template('collection_pub.html', collection=collection,
-                               items=items)
+    if ('username' not in login_session or creator.id !=
+       login_session['user_id']):
+        flash("Please login as the collection owner.")
+        return redirect(url_for('home'))
     elif request.method == 'POST':
         if request.form['name']:
             collection.name = request.form['name']
@@ -335,11 +346,12 @@ def deleteCollection(collection_id):
         Post request: flash update and redirect to home.html
     """
     collection = session.query(Collection).filter_by(id=collection_id).one()
+    creator = getUserInfo(collection.user_id)
+    if ('username' not in login_session or creator.id !=
+       login_session['user_id']):
+        flash("Please login as the collection owner.")
+        return redirect(url_for('home'))
     items = session.query(MovieItem).filter_by(collection_id=collection.id)
-    if 'username' not in login_session:
-        flash("Please login before you delete a collection.")
-        return render_template('collection_pub.html', collection=collection,
-                               items=items)
     if request.method == 'POST':
         session.delete(collection)
         session.commit()
@@ -364,17 +376,20 @@ def newMovie(collection_id):
         Post request: flash update and redirect to movie collection
     """
     collection = session.query(Collection).filter_by(id=collection_id).one()
+    creator = getUserInfo(collection.user_id)
+    if ('username' not in login_session or creator.id !=
+       login_session['user_id']):
+        flash("Please login as the collection owner.")
+        return redirect(url_for('home'))
     items = session.query(MovieItem).filter_by(collection_id=collection.id)
-    if 'username' not in login_session:
-        flash("Please login before you add a movie.")
-        return render_template('collection_pub.html', collection=collection,
-                               items=items)
     if request.method == 'POST':
         newItem = MovieItem(
             title=request.form['title'],
             year=request.form['year'],
             description=request.form['description'],
-            img=request.form['img'], collection_id=collection_id)
+            img=request.form['img'],
+            collection_id=collection_id,
+            user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         flash("New movie created!")
@@ -402,13 +417,14 @@ def editMovie(collection_id, movie_id):
         Get request: template for edit movie data
         Post request: flash update and redirect to movie collection
     """
-    editedItem = session.query(MovieItem).filter_by(id=movie_id).one()
     collection = session.query(Collection).filter_by(id=collection_id).one()
+    creator = getUserInfo(collection.user_id)
+    if ('username' not in login_session or creator.id !=
+       login_session['user_id']):
+        flash("Please login as the collection owner.")
+        return redirect(url_for('home'))
     items = session.query(MovieItem).filter_by(collection_id=collection.id)
-    if 'username' not in login_session:
-        flash("Please login before you edit a movie.")
-        return render_template('collection_pub.html', collection=collection,
-                               items=items)
+    editedItem = session.query(MovieItem).filter_by(id=movie_id).one()
     if request.method == 'POST':
         if request.form['title']:
             editedItem.title = request.form['title']
@@ -446,13 +462,14 @@ def deleteMovie(collection_id, movie_id):
         Get request: confirm request to delete movie
         Post request: flash update and redirect to movie collection
     """
-    itemToDelete = session.query(MovieItem).filter_by(id=movie_id).one()
     collection = session.query(Collection).filter_by(id=collection_id).one()
+    creator = getUserInfo(collection.user_id)
+    if ('username' not in login_session or creator.id !=
+       login_session['user_id']):
+        flash("Please login as the collection owner.")
+        return redirect(url_for('home'))
     items = session.query(MovieItem).filter_by(collection_id=collection.id)
-    if 'username' not in login_session:
-        flash("Please login before you delete a movie.")
-        return render_template('collection_pub.html', collection=collection,
-                               items=items)
+    itemToDelete = session.query(MovieItem).filter_by(id=movie_id).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
@@ -461,6 +478,30 @@ def deleteMovie(collection_id, movie_id):
                                 collection_id=collection_id))
     else:
         return render_template('deletemovie.html', item=itemToDelete)
+
+
+# User Helper Functions
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
 
 # set server settings
 if __name__ == '__main__':

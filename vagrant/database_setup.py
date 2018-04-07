@@ -17,12 +17,24 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
-# create first table for collection name and id
+
+# create table for users
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+
+
+# create table for collection name and id
 class Collection(Base):
     __tablename__ = 'collection'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
@@ -32,7 +44,8 @@ class Collection(Base):
             'id': self.id,
         }
 
-# create second table for movie data and link to collection id
+
+# create table for movie data and link to collection id
 class MovieItem(Base):
     __tablename__ = 'movie_item'
 
@@ -43,6 +56,8 @@ class MovieItem(Base):
     img = Column(String(250))
     description = Column(String(350))
     collection = relationship(Collection)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
@@ -52,7 +67,6 @@ class MovieItem(Base):
             'year': self.year,
             'img': self.img,
             'description': self.description,
-            'id': self.id,
             'id': self.id,
         }
 
