@@ -28,7 +28,15 @@ folder in your command-line interface. Type *"vagrant up"* followed by *"vagrant
 
 Once vagrant is up and running, navigate into your shared folder by typing *"cd /vagrant"*.
 
-Start the program by typing *"python home.py"*.
+Type the following:
+ * python database_setup.py
+ * python load_movies.py
+ * python home.py
+
+Once *"home.py"* running. Open your browser to:
+```
+http://localhost:5000
+```
 
 
 ## JSON Data
